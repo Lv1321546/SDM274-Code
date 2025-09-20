@@ -71,7 +71,7 @@ class LinearRegression:
         self.w1 = float(theta[1, 0])
         print(f"[最小二乘法] w0 = {self.w0:.3f}, w1 = {self.w1:.3f}")
 
-    def SGD(self, lr = 5e-4, epoch = 5000, Normalzation = 'No'):
+    def GD(self, lr = 5e-4, epoch = 5000, Normalzation = 'No', Method = 'SGD', batch_size = 25):
 
         self.w0 = np.random.normal(0,0.01)
         self.w1 = np.random.normal(0,0.01)
@@ -84,15 +84,46 @@ class LinearRegression:
             X_train_norm = self.X_train
 
         for k in range(epoch):
-            index = np.array(range(0, self.N))
-            np.random.shuffle(index)
-            for j in range(0, self.N):
-                i = index[j] # 乱序
-                x_i = float(X_train_norm[i])
-                yi_model = self.compute(x_i)
-                # print(j, i, x_i, yi_model, self.y_train[i] )
-                self.w0 += lr*(self.y_train[i] - yi_model)
-                self.w1 += lr*(self.y_train[i] - yi_model)*x_i
+            if Method == 'SGD':
+                index = np.array(range(0, self.N))
+                np.random.shuffle(index)
+                for j in range(0, self.N):
+                    i = index[j] # 乱序
+                    x_i = float(X_train_norm[i])
+                    yi_model = self.compute(x_i)
+                    # print(j, i, x_i, yi_model, self.y_train[i] )
+                    self.w0 += lr*(self.y_train[i] - yi_model)
+                    self.w1 += lr*(self.y_train[i] - yi_model)*x_i
+            elif Method == 'BGD':
+                x = np.asarray(X_train_norm, dtype=float).ravel()
+                y = np.asarray(self.y_train, dtype=float).ravel()
+
+                yi_hat = self.w0 + self.w1*x
+                error = y - yi_hat
+                self.w0 += lr*error.mean()
+                self.w1 += lr*(error*x).mean()
+                # print(error.mean())
+                
+            elif Method == 'MBGD':
+                x = np.asarray(X_train_norm, dtype=float).ravel()
+                y = np.asarray(self.y_train, dtype=float).ravel()
+                index = np.array(range(0, self.N))
+                np.random.shuffle(index)
+                for j in range(0, self.N, batch_size):
+                    i = index[j:j+batch_size]
+                    x_i = x[i]
+                    yi_model = self.w0 + self.w1*x
+                    yi_model = yi_model[i]
+                    yi_train = y[i]
+
+                    error = yi_train-yi_model
+                    self.w0 += lr * error.mean()
+                    self.w1 += lr * (error * x_i).mean()
+
+                 
+            else:
+                return
+
 
         if Normalzation == 'MinMax':
             self.w0 = self.w0 - self.w1*self.Min/self.Diff
@@ -125,19 +156,48 @@ def main():
     ## 最小二乘法
     LR_instant.OLS()
 
+    print("SGD结果")
+
     ## SGD无归一化
-    LR_instant.SGD(lr = 5e-5, epoch = 5000)
+    LR_instant.GD(lr = 5e-5, epoch = 5000, Method='SGD')
     # LR_instant.plot()
 
     ## SGD Min-Max归一化
-    LR_instant.SGD(lr = 5e-4, epoch = 5000, Normalzation= 'MinMax')
+    LR_instant.GD(lr = 5e-4, epoch = 5000, Normalzation= 'MinMax', Method='SGD')
     # LR_instant.plot()
 
     ## SGD Mean归一化
-    LR_instant.SGD(lr = 5e-4, epoch = 5000, Normalzation= 'Mean')
+    LR_instant.GD(lr = 5e-4, epoch = 5000, Normalzation= 'Mean', Method='SGD')
     # LR_instant.plot()
 
+    print("BGD结果")
+
+    ## BGD无归一化
+    LR_instant.GD(lr = 5e-4, epoch = 50000, Method='BGD')
+    # LR_instant.plot()
+
+    ## BGD Min-Max归一化
+    LR_instant.GD(lr = 5e-3, epoch = 50000, Normalzation= 'MinMax', Method='BGD')
+    # LR_instant.plot()
     
+    ## BGD Mean归一化
+    LR_instant.GD(lr = 5e-4, epoch = 50000, Normalzation= 'Mean', Method='BGD')
+    # LR_instant.plot()
+
+    print("MBGD结果")
+
+    ## MBGD无归一化
+    LR_instant.GD(lr = 5e-4, epoch = 50000, Method='MBGD')
+    # LR_instant.plot()
+
+    ## MBGD Min-Max归一化
+    LR_instant.GD(lr = 5e-3, epoch = 5000, Normalzation= 'MinMax', Method='MBGD')
+    # LR_instant.plot()
+    
+    ## MBGD Mean归一化
+    LR_instant.GD(lr = 5e-4, epoch = 5000, Normalzation= 'Mean', Method='MBGD')
+    # LR_instant.plot()
+
 if __name__ == "__main__":  
     main()
 
