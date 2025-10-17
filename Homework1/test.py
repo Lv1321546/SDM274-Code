@@ -32,6 +32,10 @@ class LinearRegression:
         return MSE
     
     def plot(self, method='SGD', normalization='No'):
+        import os
+        # 确保目录存在
+        os.makedirs("c:/Users/86135/Desktop/Codes/SDM274_Code/Homework1/plots", exist_ok=True)
+        
         y_line = self.w0 + self.w1 * self.X_train
 
         plt.figure(figsize=(10, 6))
@@ -45,7 +49,7 @@ class LinearRegression:
         plt.legend()
         
         # 保存图片
-        filename = f"Homework1/plots/{method}_{normalization}_normalization.png"
+        filename = f"c:/Users/86135/Desktop/Codes/SDM274_Code/Homework1/plots/{method}_{normalization}_normalization.png"
         plt.savefig(filename)
         plt.close()
 
@@ -72,7 +76,7 @@ class LinearRegression:
         plt.grid(True)
         
         # 保存图片
-        filename = f"Homework1/plots/{method}_{normalization}_loss.png"
+        filename = f"c:/Users/86135/Desktop/Codes/SDM274_Code/Homework1/plots/{method}_{normalization}_loss.png"
         plt.savefig(filename)
         plt.close()
     
