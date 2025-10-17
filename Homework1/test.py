@@ -45,7 +45,7 @@ class LinearRegression:
         plt.legend()
         
         # 保存图片
-        filename = f"plots/{method}_{normalization}_normalization.png"
+        filename = f"Homework1/plots/{method}_{normalization}_normalization.png"
         plt.savefig(filename)
         plt.close()
 
@@ -72,7 +72,7 @@ class LinearRegression:
         plt.grid(True)
         
         # 保存图片
-        filename = f"plots/{method}_{normalization}_loss.png"
+        filename = f"Homework1/plots/{method}_{normalization}_loss.png"
         plt.savefig(filename)
         plt.close()
     
@@ -192,15 +192,15 @@ def main():
     LR_instant.plot(method='SGD', normalization='No')
     LR_instant.plot_loss(loss_history, method='SGD', normalization='No')
 
-    ## SGD Min-Max归一化
-    loss_history = LR_instant.GD(lr = 5e-4, epoch = 5000, Normalzation= 'MinMax', Method='SGD')
-    LR_instant.plot(method='SGD', normalization='MinMax')
-    LR_instant.plot_loss(loss_history, method='SGD', normalization='MinMax')
+    # ## SGD Min-Max归一化
+    # loss_history = LR_instant.GD(lr = 5e-4, epoch = 5000, Normalzation= 'MinMax', Method='SGD')
+    # LR_instant.plot(method='SGD', normalization='MinMax')
+    # LR_instant.plot_loss(loss_history, method='SGD', normalization='MinMax')
 
-    ## SGD Mean归一化
-    loss_history = LR_instant.GD(lr = 5e-4, epoch = 5000, Normalzation= 'Mean', Method='SGD')
-    LR_instant.plot(method='SGD', normalization='Mean')
-    LR_instant.plot_loss(loss_history, method='SGD', normalization='Mean')
+    # ## SGD Mean归一化
+    # loss_history = LR_instant.GD(lr = 5e-4, epoch = 5000, Normalzation= 'Mean', Method='SGD')
+    # LR_instant.plot(method='SGD', normalization='Mean')
+    # LR_instant.plot_loss(loss_history, method='SGD', normalization='Mean')
 
     print("BGD结果")
 
@@ -209,15 +209,15 @@ def main():
     LR_instant.plot(method='BGD', normalization='No')
     LR_instant.plot_loss(loss_history, method='BGD', normalization='No')
 
-    ## BGD Min-Max归一化
-    loss_history = LR_instant.GD(lr = 5e-3, epoch = 50000, Normalzation= 'MinMax', Method='BGD')
-    LR_instant.plot(method='BGD', normalization='MinMax')
-    LR_instant.plot_loss(loss_history, method='BGD', normalization='MinMax')
+    # ## BGD Min-Max归一化
+    # loss_history = LR_instant.GD(lr = 5e-3, epoch = 50000, Normalzation= 'MinMax', Method='BGD')
+    # LR_instant.plot(method='BGD', normalization='MinMax')
+    # LR_instant.plot_loss(loss_history, method='BGD', normalization='MinMax')
     
-    ## BGD Mean归一化
-    loss_history = LR_instant.GD(lr = 5e-4, epoch = 50000, Normalzation= 'Mean', Method='BGD')
-    LR_instant.plot(method='BGD', normalization='Mean')
-    LR_instant.plot_loss(loss_history, method='BGD', normalization='Mean')
+    # ## BGD Mean归一化
+    # loss_history = LR_instant.GD(lr = 5e-4, epoch = 50000, Normalzation= 'Mean', Method='BGD')
+    # LR_instant.plot(method='BGD', normalization='Mean')
+    # LR_instant.plot_loss(loss_history, method='BGD', normalization='Mean')
 
     print("MBGD结果")
 
@@ -226,15 +226,15 @@ def main():
     LR_instant.plot(method='MBGD', normalization='No')
     LR_instant.plot_loss(loss_history, method='MBGD', normalization='No')
 
-    ## MBGD Min-Max归一化
-    loss_history = LR_instant.GD(lr = 5e-3, epoch = 5000, Normalzation= 'MinMax', Method='MBGD')
-    LR_instant.plot(method='MBGD', normalization='MinMax')
-    LR_instant.plot_loss(loss_history, method='MBGD', normalization='MinMax')
+    # ## MBGD Min-Max归一化
+    # loss_history = LR_instant.GD(lr = 5e-3, epoch = 5000, Normalzation= 'MinMax', Method='MBGD')
+    # LR_instant.plot(method='MBGD', normalization='MinMax')
+    # LR_instant.plot_loss(loss_history, method='MBGD', normalization='MinMax')
     
-    ## MBGD Mean归一化
-    loss_history = LR_instant.GD(lr = 5e-4, epoch = 5000, Normalzation= 'Mean', Method='MBGD')
-    LR_instant.plot(method='MBGD', normalization='Mean')
-    LR_instant.plot_loss(loss_history, method='MBGD', normalization='Mean')
+    # ## MBGD Mean归一化
+    # loss_history = LR_instant.GD(lr = 5e-4, epoch = 5000, Normalzation= 'Mean', Method='MBGD')
+    # LR_instant.plot(method='MBGD', normalization='Mean')
+    # LR_instant.plot_loss(loss_history, method='MBGD', normalization='Mean')
 
 if __name__ == "__main__":  
     main()
