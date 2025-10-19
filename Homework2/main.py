@@ -10,7 +10,7 @@ class BinaryClassification:
         # self.loss = 0
     
     def sigmoid(self, z):
-        # z = np.clip(z, -500, 500)
+        z = np.clip(z, -500, 500)
         sigmoid_z = 1/(1+np.exp(-z))
         return sigmoid_z
     
@@ -55,11 +55,20 @@ class BinaryClassification:
             
         return X_train, X_test, y_train, y_test
     
-    def update(self, type, X_train, y_train, epoch = 500, lr = 0.001):
+    def update(self, type, X_train, y_train, epoch = 5000, lr = 0.0001):
         train_num = X_train.shape[0]
         for k in range(epoch): # 重复训练epoch次
             if type == "Mini-batch":
-                pass
+                batch_size =20
+                index = np.array(range(0, train_num))
+                np.random.shuffle(index)
+                for j in range(0, train_num, batch_size):
+                    i = index[j:j+batch_size]
+                    x_i = X_train[i]
+                    y_i = y_train[i]
+                    gred = self.gredient(X_train[i], y_train[i])
+                    self.W = self.W - lr*gred
+
             elif type == "Stochastic":
                 index = np.array(range(0, train_num))
                 np.random.shuffle(index) # 打乱顺序
@@ -77,10 +86,19 @@ class BinaryClassification:
         # for i in range(0,test_num):
         y_pred = self.pred_function(X_test)
         accurate_num = np.sum(np.abs(y_pred - y_test)<0.5)
-        accuracy = accurate_num / test_num
-        print(f"The accurate number is {accurate_num} of {test_num}, accuracy is {accuracy:.2%}")
             
+        TP = np.sum((y_pred == 1) & (y_test == 1))  # 真正例
+        TN = np.sum((y_pred == 0) & (y_test == 0))  # 真负例
+        FP = np.sum((y_pred == 1) & (y_test == 0))  # 假正例
+        FN = np.sum((y_pred == 0) & (y_test == 1))  # 假负例
         
+        accuracy = (TP + TN) / (TP + TN + FP + FN)
+        precision = TP / (TP + FP) if (TP + FP) != 0 else 0
+        recall = TP / (TP + FN) if (TP + FN) != 0 else 0
+        f1_score = 2 * precision * recall / (precision + recall) if (precision + recall) != 0 else 0
+        
+        print(f"Metrics: Accuracy={accuracy:.2%}, Precision={precision:.2%}, Recall={recall:.2%}, F1 Score={f1_score:.2%}")
+
 if __name__ == "__main__":
     bc = BinaryClassification()
 
@@ -90,8 +108,13 @@ if __name__ == "__main__":
     # print(X_train)
     # print(bc.W.shape)
 
-    print(bc.W)
-    bc.update(type="Stochastic", X_train=X_train, y_train= y_train)
-    print(bc.W)
+    # print(bc.W)
+    print("Stochastic Gredient Descent:")
+    bc.update(type="Stochastic", X_train=X_train, y_train= y_train, lr=0.0001, epoch= 5000)
+    bc.validation(X_test, y_test)
 
-    bc.validation(X_test= X_test, y_test= y_test)
+    print("Mini-batch Gredient Descent:")
+    bc.update(type="Mini-batch", X_train=X_train, y_train= y_train, lr=0.0001, epoch= 5000)
+    bc.validation(X_test, y_test)
+    
+
