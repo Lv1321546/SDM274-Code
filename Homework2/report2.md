@@ -21,9 +21,10 @@
 
 ### **Abstract**
 
-<!-- This report presents the design and evaluation of a Python implementation of linear regression. A synthetic dataset was generated, and the model was trained using three gradient descent strategies—SGD, BGD, and MBGD—alongside two normalization techniques (min-max and mean). The closed-form least squares solution served as a baseline for comparison. Experimental results show that gradient descent methods can effectively approximate the baseline, with normalization improving convergence and stability. These findings highlight the importance of optimization strategy and preprocessing in building reliable machine learning models. -->
+This report details the implementation of a logistic regression model to solve a binary classification problem using the Wine dataset. The primary goal was to distinguish between two classes of wine based on their chemical features. The original multi-class dataset was preprocessed by removing one class to create a binary task. The data was then split into a 70% training set and a 30% test set. The logistic regression model was trained from scratch using two distinct gradient descent optimization techniques: Stochastic Gradient Descent (SGD) and Mini-batch Gradient Descent. The model's performance was subsequently evaluated on the unseen test data using standard classification metrics, including Accuracy, Precision, Recall, and F1 Score. The results indicate that the logistic regression model performs exceptionally well on this task, with both training methods achieving high scores across all evaluation metrics, demonstrating the model's effectiveness in classifying the wine samples.
 
-**Keywords:** `Binary Classification`, `Gradient descent`, `Logistic Regression`
+**Keywords**: `Logistic Regression`, `Binary Classification`, `Stochastic Gradient Descent`, `Mini-batch Gradient Descent`, `Wine Dataset`, `Machine Learning`
+
 ---
 
 
@@ -31,192 +32,114 @@
 ### **1. Introduction**
 
 **1.1. Project Background & Motivation**
-Linear regression is a fundamental machine learning technique for predicting continuous outputs, such as housing prices or sales trends. While the least squares method provides exact solutions, it can be inefficient for large datasets. Gradient descent methods—SGD, BGD, and MBGD—offer scalable alternatives and are widely used in practice. At the same time, data normalization plays a key role in improving convergence and avoiding bias caused by different feature scales. This project is motivated by the need to evaluate how optimization strategies and normalization techniques influence the training and performance of linear regression models.
+Classification is a fundamental task in machine learning that involves assigning a category or label to an input based on its features. The Wine dataset, which contains the results of a chemical analysis of wines grown in the same region in Italy but derived from three different cultivars, presents a classic classification problem. Logistic regression is a powerful and widely-used statistical model for binary classification. Unlike linear regression which predicts a continuous outcome, logistic regression predicts the probability of an instance belonging to a particular class, making it an ideal choice for tasks with a categorical outcome, such as determining a wine's cultivar from its chemical properties.
 
-**1.2. Summary of Your Project**
-In this project, I implemented a Linear Regression model in Python from scratch using Numpy. The model was designed to minimize Mean Squared Error (MSE) loss through three optimization strategies: Stochastic Gradient Descent (SGD), Batch Gradient Descent (BGD), and Mini-Batch Gradient Descent (MBGD). In addition, I integrated two data normalization methods—min-max normalization and mean normalization—to study their effects on training speed and stability. The project includes generating synthetic datasets, implementing the algorithms, visualizing convergence behaviors, and analyzing the results under different configurations.
+**1.2. Summary of My Project**
+This project focuses on the practical application of logistic regression to classify wine samples. The process began with data preprocessing, where the original three-class dataset was converted into a two-class problem. A logistic regression model was implemented from the ground up, including the sigmoid activation function, cross-entropy loss function, and gradient calculation. The model was then trained on 70% of the data using two different update methods: stochastic and mini-batch gradient descent. Finally, the trained model's ability to generalize to new, unseen data was rigorously tested using the remaining 30% of the dataset, and its performance was quantified using four key metrics: accuracy, precision, recall, and F1 score.
 
 ### **2. Problem Description and Project Objectives**
 **2.1 Problem Description**  
-The project focuses on implementing a linear regression model in Python that learns the relationship between input and output variables. Instead of relying solely on the closed-form least squares solution, iterative optimization methods—SGD, BGD, and MBGD—are applied to minimize the Mean Squared Error (MSE). In addition, the effect of data preprocessing is studied by comparing models trained with min-max normalization, mean normalization, and without normalization.  
+The goal is to build a binary classifier capable of distinguishing between two types of wine using 13 continuous features derived from chemical analysis (e.g., alcohol, malic acid, color intensity). The original dataset contains 178 samples across three wine classes. To fit the binary classification framework, the problem is simplified by removing one of the classes, leaving a two-class dataset(130 samples) for the model to learn from.
 
 **2.2 Primary Objective**  
-- Implement a Linear Regression class in Python using Numpy.  
-- Apply three gradient descent strategies: SGD, BGD, and MBGD.  
-- Incorporate min-max and mean normalization into training.  
-- Evaluate methods by comparing convergence speed, stability, and accuracy on synthetic data with visualization.  
+- To preprocess the wine dataset by removing one class and re-labeling the remaining two to create a binary classification task.
 
+- To split the processed dataset into a training set (70% of the data) and a test set (30% of the data).
 
+- To implement a logistic regression model from scratch, using the sigmoid function and the cross-entropy loss function.
+
+- To implement and use two different gradient descent update rules to train the model: Stochastic Gradient Descent (SGD) and Mini-batch Gradient Descent
+
+- To evaluate the performance of the trained models on the test set using Accuracy, Precision, Recall, and F1 Score.
 
 
 ### **3. Design & Methodology**
 
-**3.1. System Architecture / Overall Design**  
-The project is organized around a single `LinearRegression` class, with supporting functions for data generation, normalization, training, and visualization. The workflow can be summarized in four stages:
+**3.1. Model Architecture**  
+The core of this project is the logistic regression model. This model calculates a weighted sum of the input features and adds a bias term. This result, often denoted as z, is then passed through a sigmoid (or logistic) function, which squashes the output to a range between 0 and 1.
 
-1. **Data Generation**  
-   - A synthetic dataset is created using `X_train = np.arange(100)` with target values  
-     \[
-     y = x + 10 + \text{noise}
-     \]  
-     where noise follows a Gaussian distribution.
+The linear combination is given by:
 
-2. **Preprocessing**  
-   - Input data can be left unprocessed or normalized using `MinMax_Normalization()` or `Mean_Normalization()`.  
-   - Normalization is applied to improve stability and speed of convergence.
 
-3. **Model Training**  
-   - The LinearRegression class defines methods to compute predictions (`compute`), measure error (`loss_function`), and estimate parameters using three optimization strategies (`GD` with **SGD**, **BGD**, or **MBGD**).  
-   - A closed-form baseline is provided by the `OLS()` method using Numpy’s least squares solver.  
+$$z = \mathbf{w}^T \mathbf{x} = w_0x_0 + w_1x_1 + \dots + w_{13}x_{13}
+$$where $\mathbf{x}$ is the feature vector (with $x_0=1$ for the bias) and $\mathbf{w}$ is the vector of model weights.
 
-4. **Evaluation & Visualization**  
-   - Results are printed as the learned parameters \(w_0\) and \(w_1\) for each method and normalization setting.  
-   - The `plot()` method visualizes the regression line alongside training data, allowing qualitative assessment of model fitting.
+The sigmoid function then calculates the probability of the positive class (in our case, class '1'):
+
+$$P(y=1 | \mathbf{x}; \mathbf{w}) = \sigma(z) = \frac{1}{1 + e^{-z}}
+$$The model is trained by minimizing a loss function. For this probabilistic model, the **Cross-Entropy Loss** (or Negative Log-Likelihood) is the appropriate choice. It measures the dissimilarity between the true labels (`t`) and the predicted probabilities (`y`). For a single training example, the loss is:
+$$L(\mathbf{w}) = -[t \log(y) + (1-t) \log(1-y)]$$
 
  **3.2. Implementation Details**
 
-The core components of the project are implemented within the `LinearRegression` class, which includes essential methods for training, prediction, and evaluation. The key features and challenges of the implementation are outlined below:
+1. **Data Preprocessing**  
+Preparation of the raw wine.data file began by loading it into memory, after which all samples belonging to class 3 were removed to frame the task as a binary classification problem. The remaining classes, 1 and 2, were subsequently re-labeled to 0 and 1 respectively. To account for the model's bias term, a column of ones was prepended to the feature matrix. Finally, the prepared dataset was randomly shuffled and partitioned into a training set containing 70% of the data and a test set with the remaining 30%.
 
-1. **Data Generation and Normalization**  
-- Training data was generated synthetically using:
-  \[
-  y = x + 10 + \text{noise}
-  \]
-  with Gaussian noise to simulate variability.  
-- Two normalization methods were implemented as class functions:  
-  - *Min-Max Normalization*: scales features into [0,1].  
-  - *Mean Normalization*: centers data to zero mean and unit variance.  
+2. **Gradient Descent Updates**  
+The model's weights ($\mathbf{w}$) are learned by iteratively adjusting them to minimize the cross-entropy loss. This is achieved using gradient descent. The gradient of the loss function with respect to the weights for a single sample is:
 
-```python
-def MinMax_Normalization(self, Array):
-    return (Array - Array.min()) / (Array.max() - Array.min())
+$$\nabla L(\mathbf{w}) = (y - t)\mathbf{x}
+$$The weights are updated using the rule:
 
-def Mean_Normalization(self, Array):
-    return (Array - np.mean(Array)) / np.std(Array)
+$$\mathbf{w} \leftarrow \mathbf{w} - \eta \nabla L(\mathbf{w})
+$$where $\eta$ is the learning rate. Two variations of this update rule were implemented:
 
-```
-
-2. **Loss Function**  
-The model uses **Mean Squared Error (MSE)** to evaluate how well the predictions match the true values. The error for each data point is squared and averaged across all samples:
-
-\[
-MSE = \frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2
-\]
-
-Implementation in code:
-
-```python
-def loss_function(self):
-    MSE = 0
-    self.N = self.X_train.size
-    for i in range(self.X_train.size):
-        xi = self.X_train[i]
-        yi_model = self.compute(xi)
-        yi_true = self.y_train[i]
-        SE = (yi_true - yi_model) ** 2
-        MSE += SE / self.N
-    return MSE
-```
-
-3. **Optimization Methods**  
-The training process is implemented in the `GD` method, which supports three variants of gradient descent:  
-
-- **Stochastic Gradient Descent (SGD):** Updates parameters after each individual training sample. It converges faster but may fluctuate due to randomness.  
-- **Batch Gradient Descent (BGD):** Uses the entire dataset for each update, leading to stable but slower convergence.  
-- **Mini-Batch Gradient Descent (MBGD):** Splits the dataset into small batches, combining the efficiency of SGD with the stability of BGD.  
-
-The update rules for parameters \( w_0 \) (bias) and \( w_1 \) (weight) follow the general gradient descent principle:
-
-\[
-w_0 \leftarrow w_0 + \alpha \cdot \text{mean}(y - \hat{y})
-\]
-\[
-w_1 \leftarrow w_1 + \alpha \cdot \text{mean}((y - \hat{y}) \cdot x)
-\]
-
-where \(\alpha\) is the learning rate.  
-
-Pseudo-code representation:
-
-```python
-if Method == "SGD":
-    for each sample (x_i, y_i):
-        y_pred = self.compute(x_i)
-        self.w0 += lr * (y_i - y_pred)
-        self.w1 += lr * (y_i - y_pred) * x_i
-
-elif Method == "BGD":
-    y_pred_all = self.w0 + self.w1 * X_train_norm
-    error = self.y_train - y_pred_all
-    self.w0 += lr * error.mean()
-    self.w1 += lr * (error * X_train_norm).mean()
-
-elif Method == "MBGD":
-    for each batch (x_batch, y_batch):
-        y_pred_batch = self.w0 + self.w1 * x_batch
-        error = y_batch - y_pred_batch
-        self.w0 += lr * error.mean()
-        self.w1 += lr * (error * x_batch).mean()
-```
-
-4. **Baseline and Visualization**  
-To validate the correctness of the gradient descent methods, a **closed-form solution** using **Ordinary Least Squares (OLS)** was implemented with Numpy’s `lstsq` function. This serves as the baseline, providing exact parameter values against which the iterative methods can be compared.
-
-```python
-def OLS(self):
-    X = np.c_[np.ones((len(self.X_train), 1)), self.X_train.reshape(-1, 1)]
-    y = self.y_train.reshape(-1, 1)
-    theta, *_ = np.linalg.lstsq(X, y, rcond=None)
-    self.w0 = float(theta[0, 0])
-    self.w1 = float(theta[1, 0])
-    print(f"[最小二乘法] w0 = {self.w0:.3f}, w1 = {self.w1:.3f}")
-```
-These core components were built to be modular, enabling easy experimentation with different optimization methods and data preprocessing techniques.
+-  **Stochastic Gradient Descent (SGD):** The model's weights are updated after evaluating each single training sample. This method introduces more variance into the updates, which can help escape shallow local minima but can also make convergence noisy.
+-  **Mini-batch Gradient Descent:** The training data is divided into small batches (in this implementation, a batch size of 20 was used). The model's weights are updated after the gradients for all samples in a batch have been computed and averaged. This approach balances the efficiency and robustness of SGD with the stable convergence of batch gradient descent.
 
 
 
 ### **4. Testing & Results**
 
-**4.1. Testing**
-The project was tested using a synthetic dataset generated from the function \( y = x + 10 + \text{noise} \). First, the **Ordinary Least Squares (OLS)** method was applied as a baseline to verify the correctness of the implementation. Then, the custom `LinearRegression` class was evaluated with three optimization strategies—**SGD**, **BGD**, and **MBGD**—under different normalization settings (none, Min-Max, and Mean). For each case, the program printed the learned parameters \( w_0 \) and \( w_1 \), which were compared against the OLS baseline. Additionally, visualization functions (`plot`) were used to display the regression line alongside the training data, allowing direct observation of the model’s fitting performance and the effect of normalization on convergence.
+**4.1. Evaluation Metrics**
+To assess the model's performance, four standard metrics were used:
 
-![回归结果](plots/MBGD_Mean_normalization.png)
+  Accuracy: The proportion of total predictions that were correct.
+
+  $$\\ \text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}$$
+
+Precision: Of all the samples the model predicted as positive, the proportion that were actually positive. It measures the cost of a false positive.
+
+$$\\ \text{Precision} = \frac{TP}{TP + FP}$$
+
+
+Recall (Sensitivity): Of all the actual positive samples, the proportion that the model correctly identified. It measures the cost of a false negative.
+
+$$\\ \text{Recall} = \frac{TP}{TP + FN}$$
+
+
+F1 Score: The harmonic mean of Precision and Recall, providing a single score that balances both concerns.
+
+$$\\ F1 = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}$$
+
+(Where TP = True Positives, TN = True Negatives, FP = False Positives, FN = False Negatives)
+
 
 
 #### **4.2. Results and Analysis**
 
-The outcomes of the testing are summarized in the following table. The closed-form solution (OLS) was used as a baseline, and the results of SGD, BGD, and MBGD under different normalization settings were compared.  
+The model was trained for 5000 epochs with a learning rate of 0.0001. To obtain a more robust and reliable measure of performance and account for the randomness in the train-test split, the experiment was repeated 10 times. The average performance metrics across these 10 runs are summarized below.
 
-**Table: Parameter Estimation Results**
-
-| Method | Normalization | Expected Result | Actual Result | Status  |
+Table: Average Model Performance on Test Set (10 Runs)
+| Update Method | Average Accuracy | Average Precision | Average Recall | Average F1 Score |
 | :--- | :--- | :--- | :--- | :--- |
-| **OLS**  |      | w0≈7.879, w1≈1.048 | w0=7.879, w1=1.048 |  |
-| SGD  | None     | Close to OLS        | w0=7.861, w1=1.031 | Pass (slight deviation) |
-| SGD  | Min-Max  | Close to OLS        | w0=7.880, w1=1.048 | Pass |
-| SGD  | Mean     | Close to OLS        | w0=7.879, w1=1.048 | Pass |
-| BGD  | None     | Close to OLS        | w0=7.865, w1=1.048 | Pass |
-| BGD  | Min-Max  | Close to OLS        | w0=7.879, w1=1.048 | Pass |
-| BGD  | Mean     | Close to OLS        | w0=7.879, w1=1.048 | Pass |
-| MBGD | None     | Close to OLS        | w0=7.865, w1=1.017 | Pass |
-| MBGD | Min-Max  | Close to OLS        | w0=7.845, w1=1.047 | Pass |
-| MBGD | Mean     | Close to OLS        | w0=7.865, w1=1.049 | Pass |
+| Stochastic GD | 100.00% | 100.00% | 100.00% | 100.00% |
+| Mini-batch GD | 97.75% | 97.75% | 100.00% | 98.79% |
 
----
+![Results](result1.png)
 
-**Analysis:**  
-The results confirm that all implementations of gradient descent were able to approximate the baseline OLS solution.  
-- **SGD** without normalization showed small fluctuations, but with normalization (Min-Max or Mean) it converged almost exactly to the OLS values.  
-- **BGD** was stable under all conditions and produced results nearly identical to the baseline.  
-- **MBGD** without normalization showed larger deviations, but normalization—especially **Mean Normalization**—restored the results to match OLS.  
+Analysis: The aggregated results over 10 runs provide a clearer picture of the model's capabilities. The Stochastic Gradient Descent (SGD) method demonstrated remarkable consistency, achieving a perfect score across all metrics in every single run. This suggests that for this dataset, the noisy updates of SGD are highly effective at navigating the loss landscape to find an optimal solution, regardless of the random data split.
 
-Overall, the project met its objectives: the model was correctly implemented, optimization methods worked as expected, and normalization was shown to improve stability and convergence.
+The Mini-batch Gradient Descent method also performed exceptionally well, achieving a high average accuracy of 97.75%. Interestingly, it displayed some variability, with accuracy dipping in two of the ten runs (to 94.12% and 83.33%). However, a key finding is its perfect average recall of 100.00%, meaning it successfully identified every true positive sample in every run. This implies that while Mini-batch GD was occasionally less precise (making some false positive errors), it never failed to identify a sample of the positive class. The high average F1 score of 98.79% confirms its excellent overall balance between precision and recall.
+
+In conclusion, both optimization methods are highly effective for this linearly separable problem. SGD proves to be slightly more robust and consistent in achieving perfect classification, while Mini-batch provides a strong guarantee of finding all positive instances.
 
 
 ### **5. Conclusion**
 
 
-In this project, a linear regression model was implemented in Python and trained using SGD, BGD, and MBGD under different normalization settings. The results showed that all methods could approximate the closed-form OLS solution, with normalization—especially mean normalization—improving convergence and stability. The objectives of implementing the model, testing optimization strategies, and analyzing the effect of normalization were successfully achieved.  
+This project successfully demonstrated the implementation and evaluation of a logistic regression model for the binary classification of the Wine dataset. The model was built from scratch and trained effectively using both Stochastic and Mini-batch gradient descent. The evaluation on the test set yielded excellent results, with average accuracy scores above 97% for both training methods, confirming that the project objectives were met. Through this process, I gained practical experience in data preprocessing, implementing a core machine learning algorithm, understanding the nuances between different optimization strategies, and applying a suite of metrics to rigorously evaluate a classifier's performance. The high performance of a relatively simple linear model suggests that the two wine classes in the processed dataset are largely linearly separable.
 
-The main challenge was tuning learning rates and batch sizes to ensure stable training. Through this work, I gained practical experience in implementing algorithms from scratch and a deeper understanding of how optimization and preprocessing influence model performance.
+During experimentation, it was observed that the model's performance could vary between runs. This instability is an expected characteristic of the training process, primarily due to the random initialization of model weights, the random shuffling of data before the train-test split, and the inherent stochasticity of the SGD and Mini-batch optimizers. While a perfect score is achievable, the slight variations are not indicative of a flawed model but rather reflect the nature of the training process. The consistently high average performance across multiple runs confirms the model's overall robustness.
 
+To build upon this project, several improvements could be explored. Systematically tuning hyperparameters like the learning rate and batch size could lead to faster and more stable convergence. Implementing regularization (L1 or L2) could prevent potential overfitting on more complex datasets. Additionally, applying feature scaling techniques like standardization, and using a more robust evaluation method such as k-fold cross-validation, would provide a more reliable estimate of the model's true performance by mitigating the instability seen from single random splits.

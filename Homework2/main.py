@@ -109,12 +109,14 @@ if __name__ == "__main__":
     # print(bc.W.shape)
 
     # print(bc.W)
-    print("Stochastic Gredient Descent:")
-    bc.update(type="Stochastic", X_train=X_train, y_train= y_train, lr=0.0001, epoch= 5000)
-    bc.validation(X_test, y_test)
 
-    print("Mini-batch Gredient Descent:")
-    bc.update(type="Mini-batch", X_train=X_train, y_train= y_train, lr=0.0001, epoch= 5000)
-    bc.validation(X_test, y_test)
+    for i in range(10):
+        print("Stochastic Gredient Descent:")
+        bc.update(type="Stochastic", X_train=X_train, y_train= y_train, lr=0.0001, epoch= 5000)
+        bc.validation(X_test, y_test)
+
+        print("Mini-batch Gredient Descent:")
+        bc.update(type="Mini-batch", X_train=X_train, y_train= y_train, lr=0.0001, epoch= 5000)
+        bc.validation(X_test, y_test)
     
 
